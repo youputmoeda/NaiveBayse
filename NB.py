@@ -1,4 +1,3 @@
-from typing import Counter
 from numpy import log
 import numpy
 import pandas as pd
@@ -42,9 +41,9 @@ def train(emails):
     b = log(C) + log(ham) - log(spam)
     print("B(C = 1):",b[0], "B(C = 5):",b[1],"B(C = 10):",b[2])
     print('---------------')
-    R = numpy.ones((2, N))
-    Wham = N
-    Wspam = N
+    R = numpy.zeros((2, N))
+    Wham = 0
+    Wspam = 0
     i = 0
     j_Second = 0
     j = 0
@@ -89,14 +88,18 @@ def train(emails):
             i += 1
     print("Wham:",Wham)
     print("Wspam:",Wspam)
+    probability(N, R, Wham, Wspam)
+    classification(R, b, C, N)
+
+def probability(N, R, Wham, Wspam):
     s = 0
     while (s != N):
         R[0][s] = R[0][s]/Wham
         R[1][s] = R[1][s]/Wspam
         s += 1
+    return (R)
     
-    
-    
+def classification(R, b, C, N):
     t = -b
     print("t", t)
     print("sample:", Sample)
@@ -114,8 +117,10 @@ def train(emails):
 
 def main():
     data = pd.read_csv (r'spam.csv')
-    emails = pd.DataFrame(data, columns= ['v1', 'v2']).sample(frac=0.7) #Treino só se usa 70 porcento
-    train(emails)
+    emails_train = pd.DataFrame(data, columns= ['v1', 'v2']).sample(frac=0.7) #Treino só se usa 70 porcento
+    emails_probability = pd.DataFrame(data, columns= ['v1', 'v2']).sample(frac=0.15)
+    emails_classification = pd.DataFrame(data, columns= ['v1', 'v2']).sample(frac=0.15)
+    train(emails_train)
     
 
 if __name__ == "__main__":

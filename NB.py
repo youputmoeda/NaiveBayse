@@ -3,7 +3,7 @@ import numpy
 import pandas as pd
 
 
-def train(emails):
+def train(emails, emails_classification):
     ham = 0
     spam = 0
     row = emails.itertuples(index=False, name='Email')
@@ -38,12 +38,14 @@ def train(emails):
     print('---------------')
     C = 1, 5, 10
     print ("C =",C)
+    print("log(ham):", log(ham))
+    print("log(spam):", log(spam))
     b = log(C) + log(ham) - log(spam)
     print("B(C = 1):",b[0], "B(C = 5):",b[1],"B(C = 10):",b[2])
     print('---------------')
-    R = numpy.zeros((2, N))
-    Wham = 0
-    Wspam = 0
+    R = numpy.ones((2, N))
+    Wham = N
+    Wspam = N
     i = 0
     j_Second = 0
     j = 0
@@ -89,7 +91,7 @@ def train(emails):
     print("Wham:",Wham)
     print("Wspam:",Wspam)
     probability(N, R, Wham, Wspam)
-    classification(R, b, C, N)
+    classification(R, b, N, C, emails_classification)
 
 def probability(N, R, Wham, Wspam):
     s = 0
@@ -99,28 +101,50 @@ def probability(N, R, Wham, Wspam):
         s += 1
     return (R)
     
-def classification(R, b, C, N):
-    t = -b
-    print("t", t)
-    print("sample:", Sample)
-    s = 0
-    while (s != N):
-        t = t + Sample(log(R[0][s]) - log(R[1][s])) #ESTE SAMPLE E PRECISO POR REALMENTE O NUMERO CERTO
-        s += 1
-    k = 0
-    while (k != len(C)):
-        if t[k] > 0:
-            print("spam")
-        else:
-            print("Ham")
-        k += 1
+def classification(R, b, N, C, emails_classification):
+    h = 0
+    row = emails_classification.itertuples(index=False, name='Email')
+    lista = list()
+    for z in row:
+        aux = z[1].split()
+        s = 0
+        while (s != len(aux)):
+            x = s + 1
+            Word_teste = 1
+            while (x != len(aux)):
+                if aux[x] == aux[s]:
+                    Word_teste += 1
+                    aux[x] = ''
+                x += 1
+            if aux[s] == '':
+                s += 1
+                continue
+            lista.append(Word_teste)
+            s += 1
+        t = -b
+        print("t", t)
+        while (h != len(lista)):
+            for s in range(N):
+                t = t + lista[h]*(log(R[0][s]) - log(R[1][s]))
+            h += 1
+        k = 0
+        while (k != len(C)):
+            print("k", k)
+            print(t[k])
+            if t[k] > 0:
+                print("spam")
+                print (z)
+            else:
+                print("Ham")
+                print (z)
+            k += 1
 
 def main():
     data = pd.read_csv (r'spam.csv')
-    emails_train = pd.DataFrame(data, columns= ['v1', 'v2']).sample(frac=0.7) #Treino só se usa 70 porcento
+    emails = pd.DataFrame(data, columns= ['v1', 'v2']).sample(frac=0.7) #Treino só se usa 70 porcento
     emails_probability = pd.DataFrame(data, columns= ['v1', 'v2']).sample(frac=0.15)
     emails_classification = pd.DataFrame(data, columns= ['v1', 'v2']).sample(frac=0.15)
-    train(emails_train)
+    train(emails, emails_classification)
     
 
 if __name__ == "__main__":

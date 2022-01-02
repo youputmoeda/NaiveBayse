@@ -95,6 +95,7 @@ def classify_test_set(message):
     p_ham_given_message = p_ham
 
     for word in message:
+        print(word)
         if word in param_spam:
             p_spam_given_message *= param_spam[word]
 
@@ -109,7 +110,6 @@ def classify_test_set(message):
         return 'needs human classification'
 
 test_set['predicted'] = test_set['v2'].apply(classify_test_set)
-print(test_set.head())
 total_test_case=test_set.shape[0]
 correct=0
 for row in test_set.iterrows():

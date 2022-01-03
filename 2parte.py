@@ -311,8 +311,6 @@ def main():
             break
         else:
             print("Wrong code! Try again")
-    # método
-    perceptrao = False
     # proportions
     train = 0.7
     test = 0.15
